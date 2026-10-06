@@ -17,7 +17,8 @@
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
 html,body{height:100%;}
 body{
-  margin:0; background:var(--bg); color:var(--ink);
+  margin:0; color:var(--ink);
+  background:linear-gradient(180deg,#FFFBF4 0%,#FFF3DE 100%) fixed;
   font-family:ui-rounded,"SF Pro Rounded",system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
   overscroll-behavior:none; user-select:none; -webkit-user-select:none; overflow:hidden;
 }
@@ -52,7 +53,34 @@ header{display:flex; align-items:center; gap:8px;}
 .shockwave{position:absolute; border-radius:50%; border:5px solid rgba(255,190,70,.9); pointer-events:none; animation:shock .65s ease-out forwards;}
 .ripple{position:absolute; border-radius:50%; border:3px solid rgba(255,255,255,.9); pointer-events:none; animation:shock .55s ease-out forwards;}
 @keyframes shock{from{transform:scale(.15); opacity:1} to{transform:scale(1); opacity:0}}
-body.skin-neon{--bg:#141A30; --ink:#EDEAFF; --ink-soft:#9AA1CC; --board:#1F2542; --cell:#2B3358; --card:#222948; --shadow:0 10px 28px rgba(0,0,0,.5);}
+body.skin-neon{
+  --bg:#151B33; --ink:#EDEAFF; --ink-soft:#9AA1CC; --board:#1F2542; --cell:#2B3358; --card:#222948; --shadow:0 10px 28px rgba(0,0,0,.5);
+  background:
+    radial-gradient(1100px 750px at 18% -10%, #2B3763 0%, rgba(43,55,99,0) 60%),
+    radial-gradient(950px 700px at 88% 112%, #40246A 0%, rgba(64,36,106,0) 55%),
+    linear-gradient(180deg,#151B33 0%,#0D1124 100%) fixed;
+}
+body.skin-lava{
+  --bg:#1E100A; --ink:#FFEDE3; --ink-soft:#C9A48F; --board:#2A1510; --cell:#3A2018; --card:#2E1A12; --shadow:0 10px 28px rgba(0,0,0,.5);
+  background:
+    radial-gradient(900px 620px at 12% -8%, #6B2A10 0%, rgba(107,42,16,0) 55%),
+    radial-gradient(850px 650px at 90% 110%, #571505 0%, rgba(87,21,5,0) 52%),
+    linear-gradient(180deg,#1E100A 0%,#110805 100%) fixed;
+}
+body.skin-ocean{
+  --bg:#10293E; --ink:#E8F6FF; --ink-soft:#93B8CC; --board:#12344D; --cell:#1B4563; --card:#14374F; --shadow:0 10px 28px rgba(0,0,0,.45);
+  background:
+    radial-gradient(1000px 700px at 82% -10%, #175A7A 0%, rgba(23,90,122,0) 58%),
+    radial-gradient(900px 650px at 8% 112%, #0E3A5C 0%, rgba(14,58,92,0) 55%),
+    linear-gradient(180deg,#10293E 0%,#0A1B2A 100%) fixed;
+}
+body.skin-sunset{
+  --bg:#FFF8EE; --board:#F3DFC0; --cell:#FAF0DC;
+  background:
+    radial-gradient(900px 600px at 8% -6%, #FFE7C4 0%, rgba(255,231,196,0) 55%),
+    radial-gradient(820px 620px at 96% 108%, #FFD3DE 0%, rgba(255,211,222,0) 52%),
+    linear-gradient(180deg,#FFF8EE 0%,#FFEEDB 100%) fixed;
+}
 .skin-row{display:flex; align-items:center; gap:12px; width:100%; border:none; background:var(--card); border-radius:18px;
   padding:12px 14px; margin:8px 0; cursor:pointer; box-shadow:var(--shadow); font-family:inherit; color:var(--ink); touch-action:manipulation;}
 .skin-row:active{transform:scale(.97);}
@@ -344,6 +372,32 @@ const GEMS = [
   ['#FF5D73', '#A80F38'], ['#FF9E00', '#A85A00'], ['#FFE14D', '#B98F00'], ['#52E28A', '#0B7A44'],
   ['#4DC6FF', '#0A5F9E'], ['#8B7BFF', '#3726B8'], ['#D07BFF', '#6F1AB8'], ['#FF6BB0', '#A81258']
 ];
+const SUNSET = [
+  ['#FF8A5C', '#E8590C'], ['#FFB4A2', '#F4845F'], ['#FF6B8B', '#C2255C'], ['#F9A8D4', '#DB2777'],
+  ['#C084FC', '#7E22CE'], ['#FDA4AF', '#E11D48'], ['#FDE68A', '#F59E0B'], ['#FFD6A5', '#FB923C']
+];
+const OCEAN = [
+  ['#4DC6FF', '#0369A1'], ['#2DD4BF', '#0F766E'], ['#60A5FA', '#1D4ED8'], ['#38BDF8', '#075985'],
+  ['#5EEAD4', '#0D9488'], ['#93C5FD', '#3B82F6'], ['#22D3EE', '#0E7490'], ['#A5B4FC', '#4F46E5']
+];
+const FOREST = [
+  ['#8BD17C', '#2E7D32'], ['#AED581', '#558B2F'], ['#4DB6AC', '#00695C'], ['#B2A163', '#6D5C2E'],
+  ['#7CB342', '#33691E'], ['#66BB6A', '#1B5E20'], ['#C0CA33', '#827717'], ['#9E9D6B', '#5D5A33']
+];
+const MONO = [
+  ['#F2F2F2', '#CFCFCF'], ['#E0E0E0', '#BDBDBD'], ['#CECECE', '#ABABAB'], ['#BCBCBC', '#999999'],
+  ['#AAAAAA', '#878787'], ['#989898', '#757575'], ['#868686', '#636363'], ['#747474', '#515151']
+];
+const LAVA = [
+  ['#FFE14D', '#FF8500'], ['#FFB300', '#E85D04'], ['#FF7B33', '#C1121F'], ['#FFC300', '#DC2F02'],
+  ['#FFAA00', '#9D0208'], ['#FFDD33', '#FF6D00'], ['#F48C06', '#BA181B'], ['#FFEA66', '#FF7B00']
+];
+const GLASS = [
+  ['rgba(255,255,255,.9)', 'rgba(125,211,252,.45)'], ['rgba(255,255,255,.9)', 'rgba(249,168,212,.45)'],
+  ['rgba(255,255,255,.9)', 'rgba(110,231,183,.45)'], ['rgba(255,255,255,.9)', 'rgba(196,181,253,.45)'],
+  ['rgba(255,255,255,.9)', 'rgba(253,186,116,.45)'], ['rgba(255,255,255,.9)', 'rgba(253,224,71,.45)'],
+  ['rgba(255,255,255,.9)', 'rgba(103,232,249,.45)'], ['rgba(255,255,255,.9)', 'rgba(252,165,165,.45)']
+];
 const SKINS = {
   classic: { pal: PCOL, body: '', name: { en: 'Classic', es: 'Clásico' },
     style: c => ({ bg: 'linear-gradient(135deg,' + c[0] + ',' + c[1] + ')', sh: 'inset 0 3px 0 rgba(255,255,255,.45), inset 0 -3px 0 rgba(0,0,0,.14), 0 3px 7px rgba(96,64,24,.22)', br: '22%' }) },
@@ -352,9 +406,21 @@ const SKINS = {
   candy: { pal: CANDY, body: '', name: { en: 'Candy', es: 'Dulce' },
     style: c => ({ bg: 'linear-gradient(180deg,' + c[0] + ',' + c[1] + ')', sh: 'inset 0 4px 0 rgba(255,255,255,.65), inset 0 -3px 0 rgba(0,0,0,.08), 0 3px 8px rgba(160,90,90,.25)', br: '30%' }) },
   gem: { pal: GEMS, body: '', name: { en: 'Gems', es: 'Gemas' },
-    style: c => ({ bg: 'linear-gradient(135deg, rgba(255,255,255,.55) 0%, ' + c[0] + ' 32%, ' + c[1] + ' 100%)', sh: 'inset 0 2px 3px rgba(255,255,255,.7), inset 0 -3px 4px rgba(0,0,0,.25), 0 3px 8px rgba(60,30,90,.3)', br: '14%' }) }
+    style: c => ({ bg: 'linear-gradient(135deg, rgba(255,255,255,.55) 0%, ' + c[0] + ' 32%, ' + c[1] + ' 100%)', sh: 'inset 0 2px 3px rgba(255,255,255,.7), inset 0 -3px 4px rgba(0,0,0,.25), 0 3px 8px rgba(60,30,90,.3)', br: '14%' }) },
+  sunset: { pal: SUNSET, body: 'skin-sunset', name: { en: 'Sunset', es: 'Atardecer' },
+    style: c => ({ bg: 'linear-gradient(135deg,' + c[0] + ',' + c[1] + ')', sh: 'inset 0 3px 0 rgba(255,255,255,.5), inset 0 -3px 0 rgba(120,40,10,.18), 0 3px 8px rgba(200,110,50,.3)', br: '24%' }) },
+  ocean: { pal: OCEAN, body: 'skin-ocean', name: { en: 'Ocean', es: 'Océano' },
+    style: c => ({ bg: 'linear-gradient(135deg,' + c[0] + ',' + c[1] + ')', sh: 'inset 0 3px 0 rgba(255,255,255,.4), inset 0 -3px 0 rgba(0,20,40,.3), 0 0 12px ' + c[0] + '66', br: '22%' }) },
+  forest: { pal: FOREST, body: '', name: { en: 'Forest', es: 'Bosque' },
+    style: c => ({ bg: 'linear-gradient(135deg,' + c[0] + ',' + c[1] + ')', sh: 'inset 0 3px 0 rgba(255,255,255,.4), inset 0 -3px 0 rgba(10,60,20,.2), 0 3px 7px rgba(40,90,40,.28)', br: '20%' }) },
+  lava: { pal: LAVA, body: 'skin-lava', name: { en: 'Lava', es: 'Lava' },
+    style: c => ({ bg: 'linear-gradient(135deg,' + c[0] + ',' + c[1] + ')', sh: '0 0 14px ' + c[0] + 'cc, inset 0 0 10px rgba(255,255,255,.35)', br: '22%' }) },
+  mono: { pal: MONO, body: '', name: { en: 'Mono', es: 'Mono' },
+    style: c => ({ bg: c[0], sh: 'inset 0 -3px 0 rgba(0,0,0,.16), 0 2px 5px rgba(0,0,0,.18)', br: '10%' }) },
+  glass: { pal: GLASS, body: '', name: { en: 'Glass', es: 'Cristal' },
+    style: c => ({ bg: 'linear-gradient(135deg,' + c[0] + ',' + c[1] + ')', sh: 'inset 0 3px 6px rgba(255,255,255,.9), inset 0 -3px 5px rgba(110,130,170,.28), 0 3px 8px rgba(110,130,170,.22)', br: '26%' }) }
 };
-const SKIN_ORDER = ['classic', 'neon', 'candy', 'gem'];
+const SKIN_ORDER = ['classic', 'neon', 'candy', 'gem', 'sunset', 'ocean', 'forest', 'lava', 'mono', 'glass'];
 const BOMB_CSS = { bg: 'radial-gradient(circle at 35% 30%, #9a9ab5, #2e2e42 72%)', sh: '0 0 14px rgba(255,140,40,.9), inset 0 2px 5px rgba(255,255,255,.4)', br: '50%' };
 const PAL = () => SKINS[S.skin].pal;
 const blockCSS = v => v === 9 ? BOMB_CSS : SKINS[S.skin].style(PAL()[v - 1]);
