@@ -15,6 +15,7 @@
   --card:#FFFFFF; --shadow:0 10px 28px rgba(122,86,40,.13);
 }
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+.hidden{display:none !important;}
 html,body{height:100%;}
 body{
   margin:0; color:var(--ink);
@@ -81,14 +82,17 @@ body.skin-sunset{
     radial-gradient(820px 620px at 96% 108%, #FFD3DE 0%, rgba(255,211,222,0) 52%),
     linear-gradient(180deg,#FFF8EE 0%,#FFEEDB 100%) fixed;
 }
-.skin-row{display:flex; align-items:center; gap:12px; width:100%; border:none; background:var(--card); border-radius:18px;
+.skin-row, .bg-row{display:flex; align-items:center; gap:12px; width:100%; border:none; background:var(--card); border-radius:18px;
   padding:12px 14px; margin:8px 0; cursor:pointer; box-shadow:var(--shadow); font-family:inherit; color:var(--ink); touch-action:manipulation;}
-.skin-row:active{transform:scale(.97);}
-.skin-row.sel{outline:3px solid #FF9A5C;}
+.skin-row:active, .bg-row:active{transform:scale(.97);}
+.skin-row.sel, .bg-row.sel{outline:3px solid #FF9A5C;}
 .skin-name{font-weight:800; font-size:16px; flex:1; text-align:left;}
 .skin-sw{display:flex; gap:6px;}
 .skin-sw .sw{width:30px; height:30px; display:block;}
+.bg-sw{width:64px; height:30px; border-radius:10px; display:block; box-shadow:inset 0 0 0 2px rgba(255,255,255,.35), 0 2px 5px rgba(0,0,0,.2);}
 .skin-check{font-weight:900; color:#FF9A5C; font-size:20px;}
+body.bg-midnight{--bg:#0F1524; --ink:#EDEAFF; --ink-soft:#9AA1CC; --board:#1A2338; --cell:#242F4A; --card:#1B2440; --shadow:0 10px 28px rgba(0,0,0,.5);
+  background:linear-gradient(180deg,#141B30 0%,#0A0E1C 100%) fixed;}
 .pv{position:absolute; border-radius:22%; pointer-events:none; z-index:5;}
 .pv.ok{background:rgba(255,255,255,.55); box-shadow:inset 0 0 0 3px rgba(90,180,90,.85);}
 .pv.bad{background:rgba(220,60,60,.28); box-shadow:inset 0 0 0 3px rgba(220,60,60,.7);}
@@ -97,7 +101,19 @@ body.skin-sunset{
   opacity:0;}
 #banner.show{animation:bannerPop 1s ease-out forwards;}
 @keyframes bannerPop{0%{opacity:0; transform:scale(.4);} 18%{opacity:1; transform:scale(1.15);} 32%{transform:scale(1);} 78%{opacity:1;} 100%{opacity:0; transform:scale(1.05) translateY(-14px);}}
-#dedication{text-align:center; color:var(--ink-soft); font-weight:700; font-size:13px; margin:6px 0 2px;}
+#menu{position:fixed; inset:0; z-index:80; display:flex; align-items:center; justify-content:center; padding:20px;}
+#menu.hidden{display:none;}
+#menuInner{text-align:center; width:min(340px,92vw);}
+#menuInner h1{font-size:46px; margin:0 0 2px;}
+.menu-best{font-size:18px; font-weight:800; color:var(--ink-soft); margin-bottom:16px;}
+.menu-best b{color:var(--ink);}
+#btnPlay{font-size:22px;}
+.menu-grid{display:flex; gap:10px; margin-top:12px;}
+.mbtn{flex:1; border:none; border-radius:18px; background:var(--card); box-shadow:var(--shadow); padding:12px 4px 10px;
+  color:var(--ink); font-family:inherit; cursor:pointer; display:flex; flex-direction:column; align-items:center; gap:4px; touch-action:manipulation;}
+.mbtn:active{transform:scale(.95);}
+.mbtn .ic{font-size:26px;}
+.mbtn label{font-size:13px; font-weight:800;}
 #tray{display:flex; gap:10px; margin-top:6px;}
 .tray-slot{flex:1; height:104px; background:var(--card); border-radius:20px; box-shadow:var(--shadow);
   display:flex; align-items:center; justify-content:center; touch-action:none; cursor:grab; position:relative;
@@ -169,11 +185,37 @@ body.skin-sunset{
     <div id="banner"></div>
     <div id="fx"></div>
   </div>
-  <div id="dedication">Para mamá 💛</div>
   <div id="tray"></div>
   <div id="actions">
+    <button id="btnHome" class="action"><span class="ic">🏠</span><label data-i18n="menu">Menu</label></button>
     <button id="btnUndo" class="action"><span class="ic">⟲</span><label data-i18n="undo">Deshacer</label></button>
     <button id="btnSkins" class="action"><span class="ic">🎨</span><label data-i18n="skins">Diseños</label></button>
+  </div>
+</div>
+
+<div id="menu" class="hidden">
+  <div id="menuInner">
+    <h1>💥 Block Blast</h1>
+    <div class="menu-best"><span data-i18n="best">Best</span>: <b id="menuBest">0</b></div>
+    <button class="btn" id="btnPlay">▶ <span id="playLabel" data-i18n="play">Play</span></button>
+    <button class="btn secondary hidden" id="btnNewGame" data-i18n="newGame">New game</button>
+    <div class="menu-grid">
+      <button class="mbtn" id="btnMenuSkins"><span class="ic">🎨</span><label data-i18n="skins">Skins</label></button>
+      <button class="mbtn" id="btnMenuBg"><span class="ic">🌅</span><label data-i18n="background">Background</label></button>
+    </div>
+    <div class="menu-grid">
+      <button class="mbtn" id="btnMenuLang"><span class="ic">🌐</span><label id="menuLangLabel">EN</label></button>
+      <button class="mbtn" id="btnHowTo"><span class="ic">❓</span><label data-i18n="howToPlay">How to play</label></button>
+    </div>
+  </div>
+</div>
+
+<div id="modalBg" class="modal hidden">
+  <div class="sheet">
+    <h2 data-i18n="background">Background</h2>
+    <p data-i18n="bgSub">Choose your background</p>
+    <div id="bgList"></div>
+    <button class="btn secondary" id="btnBgClose" data-i18n="close">Close</button>
   </div>
 </div>
 
@@ -399,28 +441,45 @@ const GLASS = [
   ['rgba(255,255,255,.9)', 'rgba(103,232,249,.45)'], ['rgba(255,255,255,.9)', 'rgba(252,165,165,.45)']
 ];
 const SKINS = {
-  classic: { pal: PCOL, body: '', name: { en: 'Classic', es: 'Clásico' },
+  classic: { pal: PCOL, bg: 'cream', name: { en: 'Classic', es: 'Clásico' },
     style: c => ({ bg: 'linear-gradient(135deg,' + c[0] + ',' + c[1] + ')', sh: 'inset 0 3px 0 rgba(255,255,255,.45), inset 0 -3px 0 rgba(0,0,0,.14), 0 3px 7px rgba(96,64,24,.22)', br: '22%' }) },
-  neon: { pal: PCOL, body: 'skin-neon', name: { en: 'Neon', es: 'Neón' },
+  neon: { pal: PCOL, bg: 'neon', name: { en: 'Neon', es: 'Neón' },
     style: c => ({ bg: 'linear-gradient(135deg,' + c[0] + ',' + c[1] + ')', sh: '0 0 14px ' + c[0] + 'cc, inset 0 0 10px rgba(255,255,255,.35)', br: '22%' }) },
-  candy: { pal: CANDY, body: '', name: { en: 'Candy', es: 'Dulce' },
+  candy: { pal: CANDY, bg: 'cream', name: { en: 'Candy', es: 'Dulce' },
     style: c => ({ bg: 'linear-gradient(180deg,' + c[0] + ',' + c[1] + ')', sh: 'inset 0 4px 0 rgba(255,255,255,.65), inset 0 -3px 0 rgba(0,0,0,.08), 0 3px 8px rgba(160,90,90,.25)', br: '30%' }) },
-  gem: { pal: GEMS, body: '', name: { en: 'Gems', es: 'Gemas' },
+  gem: { pal: GEMS, bg: 'cream', name: { en: 'Gems', es: 'Gemas' },
     style: c => ({ bg: 'linear-gradient(135deg, rgba(255,255,255,.55) 0%, ' + c[0] + ' 32%, ' + c[1] + ' 100%)', sh: 'inset 0 2px 3px rgba(255,255,255,.7), inset 0 -3px 4px rgba(0,0,0,.25), 0 3px 8px rgba(60,30,90,.3)', br: '14%' }) },
-  sunset: { pal: SUNSET, body: 'skin-sunset', name: { en: 'Sunset', es: 'Atardecer' },
+  sunset: { pal: SUNSET, bg: 'sunset', name: { en: 'Sunset', es: 'Atardecer' },
     style: c => ({ bg: 'linear-gradient(135deg,' + c[0] + ',' + c[1] + ')', sh: 'inset 0 3px 0 rgba(255,255,255,.5), inset 0 -3px 0 rgba(120,40,10,.18), 0 3px 8px rgba(200,110,50,.3)', br: '24%' }) },
-  ocean: { pal: OCEAN, body: 'skin-ocean', name: { en: 'Ocean', es: 'Océano' },
+  ocean: { pal: OCEAN, bg: 'ocean', name: { en: 'Ocean', es: 'Océano' },
     style: c => ({ bg: 'linear-gradient(135deg,' + c[0] + ',' + c[1] + ')', sh: 'inset 0 3px 0 rgba(255,255,255,.4), inset 0 -3px 0 rgba(0,20,40,.3), 0 0 12px ' + c[0] + '66', br: '22%' }) },
-  forest: { pal: FOREST, body: '', name: { en: 'Forest', es: 'Bosque' },
+  forest: { pal: FOREST, bg: 'cream', name: { en: 'Forest', es: 'Bosque' },
     style: c => ({ bg: 'linear-gradient(135deg,' + c[0] + ',' + c[1] + ')', sh: 'inset 0 3px 0 rgba(255,255,255,.4), inset 0 -3px 0 rgba(10,60,20,.2), 0 3px 7px rgba(40,90,40,.28)', br: '20%' }) },
-  lava: { pal: LAVA, body: 'skin-lava', name: { en: 'Lava', es: 'Lava' },
+  lava: { pal: LAVA, bg: 'lava', name: { en: 'Lava', es: 'Lava' },
     style: c => ({ bg: 'linear-gradient(135deg,' + c[0] + ',' + c[1] + ')', sh: '0 0 14px ' + c[0] + 'cc, inset 0 0 10px rgba(255,255,255,.35)', br: '22%' }) },
-  mono: { pal: MONO, body: '', name: { en: 'Mono', es: 'Mono' },
+  mono: { pal: MONO, bg: 'cream', name: { en: 'Mono', es: 'Mono' },
     style: c => ({ bg: c[0], sh: 'inset 0 -3px 0 rgba(0,0,0,.16), 0 2px 5px rgba(0,0,0,.18)', br: '10%' }) },
-  glass: { pal: GLASS, body: '', name: { en: 'Glass', es: 'Cristal' },
+  glass: { pal: GLASS, bg: 'cream', name: { en: 'Glass', es: 'Cristal' },
     style: c => ({ bg: 'linear-gradient(135deg,' + c[0] + ',' + c[1] + ')', sh: 'inset 0 3px 6px rgba(255,255,255,.9), inset 0 -3px 5px rgba(110,130,170,.28), 0 3px 8px rgba(110,130,170,.22)', br: '26%' }) }
 };
 const SKIN_ORDER = ['classic', 'neon', 'candy', 'gem', 'sunset', 'ocean', 'forest', 'lava', 'mono', 'glass'];
+const BGS = {
+  cream:    { body: '',            name: { en: 'Cream', es: 'Crema' } },
+  sunset:   { body: 'skin-sunset', name: { en: 'Sunset glow', es: 'Atardecer' } },
+  neon:     { body: 'skin-neon',   name: { en: 'Neon night', es: 'Noche neón' } },
+  ocean:    { body: 'skin-ocean',  name: { en: 'Deep ocean', es: 'Océano' } },
+  lava:     { body: 'skin-lava',   name: { en: 'Ember', es: 'Brasa' } },
+  midnight: { body: 'bg-midnight', name: { en: 'Midnight', es: 'Medianoche' } }
+};
+const BG_ORDER = ['cream', 'sunset', 'neon', 'ocean', 'lava', 'midnight'];
+const BG_PREVIEW = {
+  cream: 'linear-gradient(135deg,#FFFBF4,#FFE9C4)',
+  sunset: 'linear-gradient(135deg,#FFE7C4,#FFD3DE)',
+  neon: 'linear-gradient(135deg,#2B3763,#40246A)',
+  ocean: 'linear-gradient(135deg,#175A7A,#0E3A5C)',
+  lava: 'linear-gradient(135deg,#6B2A10,#571505)',
+  midnight: 'linear-gradient(135deg,#1B2438,#0B0F1D)'
+};
 const BOMB_CSS = { bg: 'radial-gradient(circle at 35% 30%, #9a9ab5, #2e2e42 72%)', sh: '0 0 14px rgba(255,140,40,.9), inset 0 2px 5px rgba(255,255,255,.4)', br: '50%' };
 const PAL = () => SKINS[S.skin].pal;
 const blockCSS = v => v === 9 ? BOMB_CSS : SKINS[S.skin].style(PAL()[v - 1]);
@@ -430,12 +489,16 @@ const S = {
   music: store.get('music', true),
   best: store.get('best', 0),
   seenTutorial: store.get('seenTutorial', false),
-  skin: store.get('skin', 'classic')
+  skin: store.get('skin', 'classic'),
+  bg: store.get('bg', null)
 };
-function saveSettings() { store.set('lang', S.lang); store.set('sound', S.sound); store.set('music', S.music); store.set('best', S.best); store.set('seenTutorial', S.seenTutorial); store.set('skin', S.skin); }
-function applySkin() {
-  if (!SKINS[S.skin]) S.skin = 'classic';
-  document.body.className = SKINS[S.skin].body;
+// migrate: existing players keep the background their skin implied
+if (!S.bg || !BGS[S.bg]) S.bg = (SKINS[S.skin] && SKINS[S.skin].bg) || 'cream';
+if (!SKINS[S.skin]) S.skin = 'classic';
+function saveSettings() { store.set('lang', S.lang); store.set('sound', S.sound); store.set('music', S.music); store.set('best', S.best); store.set('seenTutorial', S.seenTutorial); store.set('skin', S.skin); store.set('bg', S.bg); }
+function applyTheme() {
+  const b = BGS[S.bg] || BGS.cream;
+  document.body.className = b.body;
   if (G) { renderGrid(); renderTray(); }
 }
 
@@ -448,27 +511,31 @@ const STR = {
   en: { score: 'Score', best: 'Best', undo: 'Undo', gameOver: 'Game over!', newBest: 'New best! 🏆',
     playAgain: 'Play again', overSub: 'Good game! One more?', tutSub: 'No ads · with sound 🎶',
     tut1: 'Drag the pieces onto the 8×8 board', tut2: 'Fill full rows or columns to blast them away',
-    tut3: 'The game ends when no piece fits — plan ahead!', tutGo: 'Play!', dedication: 'For mom 💛',
+    tut3: 'The game ends when no piece fits — plan ahead!', tutGo: 'Play!',
     tut4: 'Rare 💣 bombs blast a whole 3×3 area',
     combo2: 'Double!', combo3: 'Triple!', combo4: 'Amazing!', streak: n => 'Streak x' + n + '!',
     boom: '💥 BOOM!', skins: 'Skins', skinsSub: 'Pick your block style', close: 'Close',
+    menu: 'Menu', play: 'Play', continue: 'Continue', newGame: 'New game',
+    background: 'Background', bgSub: 'Choose your background', howToPlay: 'How to play',
     noUndo: 'Nothing to undo yet' },
   es: { score: 'Puntos', best: 'Récord', undo: 'Deshacer', gameOver: '¡Fin del juego!', newBest: '¡Nuevo récord! 🏆',
     playAgain: 'Jugar de nuevo', overSub: '¡Buen juego! ¿Otra vez?', tutSub: 'Sin anuncios · con sonido 🎶',
     tut1: 'Arrastra las piezas al tablero de 8×8', tut2: 'Llena filas o columnas para reventarlas',
-    tut3: 'El juego termina cuando no cabe nada ¡planea con cuidado!', tutGo: '¡A jugar!', dedication: 'Para mamá 💛',
+    tut3: 'El juego termina cuando no cabe nada ¡planea con cuidado!', tutGo: '¡A jugar!',
     tut4: 'Las 💣 bombas raras revientan un área de 3×3',
     combo2: '¡Doble!', combo3: '¡Triple!', combo4: '¡Increíble!', streak: n => '¡Racha x' + n + '!',
     boom: '¡BOOM! 💥', skins: 'Diseños', skinsSub: 'Elige el estilo de tus bloques', close: 'Cerrar',
+    menu: 'Menú', play: 'Jugar', continue: 'Continuar', newGame: 'Juego nuevo',
+    background: 'Fondo', bgSub: 'Elige tu fondo', howToPlay: 'Cómo jugar',
     noUndo: 'Aún no hay nada que deshacer' }
 };
 const t = k => STR[S.lang][k] || k;
 function applyI18n() {
   document.documentElement.lang = S.lang;
   document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.getAttribute('data-i18n')); });
-  $('dedication').textContent = t('dedication');
   $('btnLang').textContent = S.lang.toUpperCase();
   $('bestNum').textContent = S.best.toLocaleString();
+  refreshMenu();
 }
 
 /* ---------- audio ---------- */
@@ -958,7 +1025,7 @@ function refreshToggles() {
 $('btnSound').addEventListener('click', () => { S.sound = !S.sound; saveSettings(); refreshToggles(); sfx.click(); });
 $('btnMusic').addEventListener('click', () => { S.music = !S.music; saveSettings(); refreshToggles(); sfx.click(); if (S.music) musicPluck(); });
 $('btnLang').addEventListener('click', () => { S.lang = S.lang === 'es' ? 'en' : 'es'; saveSettings(); applyI18n(); sfx.click(); });
-$('btnTutGo').addEventListener('click', () => { sfx.click(); S.seenTutorial = true; saveSettings(); $('modalTut').classList.add('hidden'); });
+$('btnTutGo').addEventListener('click', () => { sfx.click(); S.seenTutorial = true; saveSettings(); $('modalTut').classList.add('hidden'); showMenu(); });
 
 /* ---------- skins picker ---------- */
 function renderSkinList() {
@@ -986,7 +1053,7 @@ function renderSkinList() {
       row.appendChild(chk);
     }
     row.addEventListener('click', () => {
-      S.skin = id; saveSettings(); applySkin(); renderSkinList(); sfx.click();
+      S.skin = id; S.bg = SKINS[id].bg; saveSettings(); applyTheme(); renderSkinList(); sfx.click();
     });
     list.appendChild(row);
   });
@@ -994,23 +1061,86 @@ function renderSkinList() {
 $('btnSkins').addEventListener('click', () => { sfx.click(); renderSkinList(); $('modalSkin').classList.remove('hidden'); });
 $('btnSkinClose').addEventListener('click', () => { sfx.click(); $('modalSkin').classList.add('hidden'); });
 
+/* ---------- background picker ---------- */
+function renderBgList() {
+  const list = $('bgList');
+  list.innerHTML = '';
+  BG_ORDER.forEach(id => {
+    const b = BGS[id];
+    const row = document.createElement('button');
+    row.className = 'bg-row' + (S.bg === id ? ' sel' : '');
+    const nm = document.createElement('span');
+    nm.className = 'skin-name'; nm.textContent = b.name[S.lang];
+    const sw = document.createElement('span');
+    sw.className = 'bg-sw'; sw.style.background = BG_PREVIEW[id];
+    row.appendChild(nm); row.appendChild(sw);
+    if (S.bg === id) {
+      const chk = document.createElement('span');
+      chk.className = 'skin-check'; chk.textContent = '✓';
+      row.appendChild(chk);
+    }
+    row.addEventListener('click', () => {
+      S.bg = id; saveSettings(); applyTheme(); renderBgList(); sfx.click();
+    });
+    list.appendChild(row);
+  });
+}
+$('btnBgClose').addEventListener('click', () => { sfx.click(); $('modalBg').classList.add('hidden'); });
+
+/* ---------- main menu ---------- */
+function hasLiveSave() {
+  try {
+    const d = store.get('game', null);
+    if (!d || !Array.isArray(d.grid)) return false;
+    const active = d.grid.some(row => row.some(v => v !== 0)) || (d.score > 0);
+    if (!active) return false;
+    const tray = (d.tray || []).map(tp => ({ shape: SHAPES[tp.s], used: !!tp.u })).filter(p => p.shape);
+    return anyMove(d.grid, tray);
+  } catch (e) { return false; }
+}
+function refreshMenu() {
+  if (!$('menu')) return;
+  $('menuBest').textContent = S.best.toLocaleString();
+  const live = hasLiveSave();
+  $('playLabel').textContent = live ? t('continue') : t('play');
+  $('btnNewGame').classList.toggle('hidden', !live);
+  $('menuLangLabel').textContent = S.lang.toUpperCase();
+}
+function showMenu() { refreshMenu(); $('menu').classList.remove('hidden'); }
+function hideMenu() { $('menu').classList.add('hidden'); }
+$('btnPlay').addEventListener('click', () => {
+  sfx.click();
+  if (!hasLiveSave()) newGame();
+  hideMenu();
+});
+$('btnNewGame').addEventListener('click', () => { sfx.click(); newGame(); hideMenu(); });
+$('btnHome').addEventListener('click', () => { sfx.click(); showMenu(); });
+$('btnMenuSkins').addEventListener('click', () => { sfx.click(); renderSkinList(); $('modalSkin').classList.remove('hidden'); });
+$('btnMenuBg').addEventListener('click', () => { sfx.click(); renderBgList(); $('modalBg').classList.remove('hidden'); });
+$('btnMenuLang').addEventListener('click', () => {
+  S.lang = S.lang === 'es' ? 'en' : 'es'; saveSettings(); applyI18n(); sfx.click();
+});
+$('btnHowTo').addEventListener('click', () => { sfx.click(); $('modalTut').classList.remove('hidden'); });
+
 /* ---------- init ---------- */
 applyI18n();
 refreshToggles();
 buildCells();
 if (!restoreGame()) newGame();
 else { dispScore = scoreTarget = G.score; $('scoreNum').textContent = G.score.toLocaleString(); }
-applySkin();
+applyTheme();
 layout();
 window.addEventListener('resize', layout);
 renderGrid(); renderTray();
 $('bestNum').textContent = S.best.toLocaleString();
+showMenu();
 if (!S.seenTutorial) $('modalTut').classList.remove('hidden');
 
 /* debug hook for automated playtesting */
 window.BB = { state: () => G, place: (i, x, y) => doPlace(i, x, y), newGame, SHAPES, canPlace, findClears,
   setTray: specs => { G.tray = specs.map(([si, c, b]) => ({ shape: SHAPES[si], color: c, used: false, bomb: !!b })); renderTray(); },
-  setSkin: id => { S.skin = id; applySkin(); } };
+  setSkin: id => { S.skin = id; S.bg = SKINS[id].bg; saveSettings(); applyTheme(); },
+  setBg: id => { S.bg = id; saveSettings(); applyTheme(); } };
 </script>
 </body>
 </html>
