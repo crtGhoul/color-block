@@ -101,6 +101,10 @@ body.bg-midnight{--bg:#0F1524; --ink:#EDEAFF; --ink-soft:#9AA1CC; --board:#1A233
   opacity:0;}
 #banner.show{animation:bannerPop 1s ease-out forwards;}
 @keyframes bannerPop{0%{opacity:0; transform:scale(.4);} 18%{opacity:1; transform:scale(1.15);} 32%{transform:scale(1);} 78%{opacity:1;} 100%{opacity:0; transform:scale(1.05) translateY(-14px);}}
+#comboBadge{position:absolute; top:-10px; left:50%; transform:translateX(-50%); z-index:30; pointer-events:none;
+  background:linear-gradient(135deg,#FF9A5C,#FF6B6B); color:#fff; font-weight:900; font-size:15px;
+  padding:6px 14px; border-radius:999px; box-shadow:0 4px 12px rgba(255,110,80,.45); display:none; white-space:nowrap;}
+#comboBadge.show{display:block; animation:pop .3s cubic-bezier(.2,1.6,.4,1);}
 #menu{position:fixed; inset:0; z-index:80; display:flex; align-items:center; justify-content:center; padding:20px;}
 #menu.hidden{display:none;}
 #menuInner{text-align:center; width:min(340px,92vw);}
@@ -183,6 +187,7 @@ body.bg-midnight{--bg:#0F1524; --ink:#EDEAFF; --ink-soft:#9AA1CC; --board:#1A233
   <div id="boardWrap">
     <div id="board"></div>
     <div id="banner"></div>
+    <div id="comboBadge"></div>
     <div id="fx"></div>
   </div>
   <div id="tray"></div>
@@ -675,16 +680,24 @@ function renderTray() {
     trayEl.appendChild(slot);
   });
 }
+function dealTray() {
+  // Friendlier than pure random: re-deal until at least one piece fits the board,
+  // so mom never gets a hopeless tray. Game over still happens naturally.
+  for (let t = 0; t < 30; t++) {
+    const tray = [randomPiece(G.rng), randomPiece(G.rng), randomPiece(G.rng)];
+    let seenBomb = false; // max one bomb per tray
+    tray.forEach(p => {
+      if (p.bomb) {
+        if (seenBomb) { const np = randomPiece(G.rng, false); p.shape = np.shape; p.color = np.color; p.bomb = false; }
+        else seenBomb = true;
+      }
+    });
+    if (tray.some(p => fitsAnywhere(G.grid, p.shape))) return tray;
+  }
+  return [randomPiece(G.rng, false), randomPiece(G.rng, false), randomPiece(G.rng, false)];
+}
 function refill() {
-  const tray = [randomPiece(G.rng), randomPiece(G.rng), randomPiece(G.rng)];
-  let seenBomb = false; // max one bomb per tray
-  tray.forEach(p => {
-    if (p.bomb) {
-      if (seenBomb) { const np = randomPiece(G.rng, false); p.shape = np.shape; p.color = np.color; p.bomb = false; }
-      else seenBomb = true;
-    }
-  });
-  G.tray = tray;
+  G.tray = dealTray();
   renderTray();
   [...trayEl.children].forEach((s, i) => {
     s.animate([{ transform: 'scale(.4)', opacity: 0 }, { transform: 'scale(1)', opacity: 1 }],
@@ -780,7 +793,8 @@ function doPlace(idx, gx, gy) {
     cols.forEach(x => { for (let y = 0; y < N; y++) cells.push([x, y]); });
     cells.forEach(([x, y]) => cellEls[y][x].classList.add('clearing'));
     const ns = G.streak + 1;
-    const bonus = clearBonus(n) + streakBonus(ns);
+    const mult = Math.min(ns, 8); // Block-Blast-style combo multiplier
+    const bonus = clearBonus(n) * mult;
     G.streak = ns;
     setTimeout(() => {
       if (!PAGE_ALIVE) return;
@@ -791,11 +805,12 @@ function doPlace(idx, gx, gy) {
       const cxp = bc.left + bc.width / 2, cyp = bc.top + bc.height / 2;
       addScore(bonus, [cxp, cyp]);
       sfx.clear(n);
-      if (n >= 2) {
-        banner(t('combo' + Math.min(n, 4))); sfx.combo();
-        shakeApp(); shockwave(cxp, cyp);
-      }
-      else if (ns >= 2) banner(t('streak')(ns));
+      const parts = [];
+      if (n >= 2) parts.push(t('combo' + Math.min(n, 4)));
+      if (ns >= 2) parts.push('×' + ns + ' 🔥');
+      if (parts.length) { banner(parts.join(' ')); sfx.combo(); }
+      if (n >= 2) { shakeApp(); shockwave(cxp, cyp); }
+      refreshComboBadge();
       cells.forEach(([x, y], i) => {
         const r = cellEls[y][x].getBoundingClientRect();
         particle(r.left + r.width / 2, r.top + r.height / 2, PAL()[(clearColors[i] - 1 + PAL().length) % PAL().length][0]);
@@ -806,6 +821,7 @@ function doPlace(idx, gx, gy) {
     }, 400);
   } else {
     G.streak = 0;
+    refreshComboBadge();
     afterMove();
   }
 }
@@ -933,6 +949,7 @@ function newGame() {
   $('scoreNum').textContent = '0';
   refill();
   renderGrid();
+  refreshComboBadge();
   $('modalOver').classList.add('hidden');
   persist();
 }
@@ -946,6 +963,7 @@ $('btnUndo').addEventListener('click', () => {
   dispScore = scoreTarget = G.score;
   $('scoreNum').textContent = G.score.toLocaleString();
   renderGrid(); renderTray();
+  refreshComboBadge();
   persist();
 });
 $('btnAgain').addEventListener('click', () => { sfx.click(); newGame(); });
@@ -955,6 +973,16 @@ function banner(text) {
   const b = $('banner');
   b.textContent = text;
   b.classList.remove('show'); void b.offsetWidth; b.classList.add('show');
+}
+function refreshComboBadge() {
+  const b = $('comboBadge');
+  if (!b) return;
+  if (G && G.streak >= 2) {
+    b.textContent = '🔥 ×' + Math.min(G.streak, 8);
+    b.classList.remove('show'); void b.offsetWidth; b.classList.add('show');
+  } else {
+    b.classList.remove('show');
+  }
 }
 function floatScore(text, pos) {
   const d = document.createElement('div');
@@ -1140,7 +1168,8 @@ if (!S.seenTutorial) $('modalTut').classList.remove('hidden');
 window.BB = { state: () => G, place: (i, x, y) => doPlace(i, x, y), newGame, SHAPES, canPlace, findClears,
   setTray: specs => { G.tray = specs.map(([si, c, b]) => ({ shape: SHAPES[si], color: c, used: false, bomb: !!b })); renderTray(); },
   setSkin: id => { S.skin = id; S.bg = SKINS[id].bg; saveSettings(); applyTheme(); },
-  setBg: id => { S.bg = id; saveSettings(); applyTheme(); } };
+  setBg: id => { S.bg = id; saveSettings(); applyTheme(); },
+  dealTray: () => { G.tray = dealTray(); renderTray(); } };
 </script>
 </body>
 </html>
